@@ -47,7 +47,7 @@ public class EmpresaControllerTest {
         mockMvc.perform(post("/empresas/criar")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"razaoSocial\":\"TesteEmpresa\"}")) // Correção aqui
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.razaoSocial", is("TesteEmpresa"))); // Correção aqui
     }
 
@@ -74,7 +74,7 @@ public class EmpresaControllerTest {
     @Test
     public void testExcluirEmpresa() throws Exception {
         mockMvc.perform(delete("/empresas/excluir/12345"))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
 
         verify(empresaService, times(1)).excluirEmpresa("12345");
     }

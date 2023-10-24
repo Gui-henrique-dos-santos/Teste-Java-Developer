@@ -44,7 +44,7 @@ public class ClienteControllerTest {
         mockMvc.perform(post("/clientes/criar")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"nome\":\"Teste\"}"))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.nome", is("Teste")));
     }
     @Test
@@ -70,7 +70,7 @@ public class ClienteControllerTest {
     @Test
     public void testExcluirCliente() throws Exception {
         mockMvc.perform(delete("/clientes/excluir/12345"))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
 
         verify(clienteService, times(1)).excluirCliente("12345");
     }

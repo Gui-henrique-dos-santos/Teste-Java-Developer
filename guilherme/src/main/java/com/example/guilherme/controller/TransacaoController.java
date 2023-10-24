@@ -5,10 +5,8 @@ import com.example.guilherme.service.TransacaoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/transacoes")
@@ -18,6 +16,7 @@ public class TransacaoController {
     private TransacaoService transacaoService;
     @ApiOperation(value = "Processar uma transação")
     @PostMapping("/processar")
+    @ResponseStatus(HttpStatus.CREATED)
     public void processarTransacao(@RequestBody Transacao transacao) {
         transacaoService.processarTransacao(transacao);
     }

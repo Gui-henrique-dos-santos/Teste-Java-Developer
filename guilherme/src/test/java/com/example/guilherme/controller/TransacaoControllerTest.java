@@ -47,7 +47,7 @@ public class TransacaoControllerTest {
                 .when()
                 .post("/transacoes/processar")
                 .then()
-                .statusCode(200);
+                .statusCode(201);
     }
 }
 

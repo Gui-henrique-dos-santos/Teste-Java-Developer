@@ -1,16 +1,18 @@
 package com.example.guilherme.service;
 
-
 import com.example.guilherme.model.Cliente;
 import com.example.guilherme.model.Empresa;
 import com.example.guilherme.model.Transacao;
 import com.example.guilherme.repository.ClienteRepository;
 import com.example.guilherme.repository.EmpresaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 
 @Service
 public class TransacaoService {
@@ -37,14 +39,14 @@ public class TransacaoService {
         } else if ("empresa".equalsIgnoreCase(transacao.getTipoDestino())) {
             processarTransacaoEmpresa(transacao);
         } else {
-            throw new RuntimeException("Tipo de destino inválido.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tipo de destino inválido.");
         }
     }
 
     private void processarTransacaoCliente(Transacao transacao) {
         Cliente cliente = clienteRepository.findByCpf(transacao.getCpfDestino());
         if (cliente == null) {
-            throw new RuntimeException("Cliente não encontrado.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente não encontrado.");
         }
 
         aplicarTaxa(transacao);
@@ -60,7 +62,7 @@ public class TransacaoService {
     private void processarTransacaoEmpresa(Transacao transacao) {
         Empresa empresa = empresaRepository.findByCnpj(transacao.getCnpjDestino());
         if (empresa == null) {
-            throw  new RuntimeException("Empresa não encontrada.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Empresa não encontrada.");
         }
 
         aplicarTaxa(transacao);
@@ -102,7 +104,7 @@ public class TransacaoService {
 
     private void realizarDeposito(Empresa empresa, double valor) {
         if (valor <= 0) {
-            throw new RuntimeException("O valor do depósito deve ser maior que zero.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O valor do depósito deve ser maior que zero.");
         }
 
         double saldoAtual = empresa.getSaldo();
@@ -117,13 +119,13 @@ public class TransacaoService {
 
     private void realizarSaque(Empresa empresa, double valor) {
         if (valor <= 0) {
-            throw new RuntimeException("O valor do saque deve ser maior que zero.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O valor do saque deve ser maior que zero.");
         }
 
         double saldoAtual = empresa.getSaldo();
 
         if (valor > saldoAtual) {
-            throw new RuntimeException("Saldo insuficiente para o saque.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Saldo insuficiente para o saque.");
         }
 
         double novoSaldo = saldoAtual - valor;
@@ -134,5 +136,4 @@ public class TransacaoService {
         // Salve a empresa no repositório (ou realize qualquer ação necessária)
         empresaRepository.save(empresa);
     }
-
 }
